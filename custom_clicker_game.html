@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clicker Game</title>
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/kVdb8WRj/pixel-art-mystical-background-52683-87349-1.jpg');
+            background-size: cover;
+            background-repeat : no-repeat;
+            background-attachment: fixed;
+            color: rgb(0, 255, 76);
+        } 
+        button {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: rgb(0, 255, 76);
+            border:6px solid rgb(0, 255, 76);
+            padding: 40px 20px;
+            margin: 20px;
+            cursor: pointer;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h2>welcome to my new clicker game</h2>
+    <p id="score">score: 0</p>
+    <p id="gems">gems: 0</p>
+    <button onclick="increasescore()">bottone</button>
+    <button onclick="resetscore()">reset</button>  
+    <button onclick="upgradescore()" id="upgradebutton" disabled>upgrade cost:2000</button>
+    <button onclick="rebirth()" id="rebirthbutton" disabled>Rebirth (10000 score)</button>
+    <h3>Gem Upgrades:</h3>
+    <button onclick="buyGemUpgrade('clickMultiplier')" id="clickMultiplierUpgrade">Increase Click Multiplier (Cost: 1 gem)</button>
+    <button onclick="buyGemUpgrade('autoClicker')" id="autoClickerUpgrade">Buy Auto Clicker (Cost: 5 gems)</button>
+    <script>
+     let score = 0;
+     let multiplier = 1;
+     let upgradecost = 2000;
+     let gems = 0;
+     let rebirthCost = 10000;
+     let clickMultiplier = 1;
+     let autoClickerInterval = null;
+
+     function increasescore() {
+        score += 100 * multiplier * clickMultiplier;
+        updatescore();
+     }
+
+     function resetscore() {
+        score = 0;
+        updatescore();
+     }
+
+     function upgradescore() {
+         if (score >= upgradecost) {
+            multiplier *= 2;
+            upgradecost *= 2;
+            score -= upgradecost / 2;
+            updatescore();
+            document.getElementById("upgradebutton").textContent =`upgrade (cost: ${upgradecost})`;
+         }
+     }
+
+     function rebirth() {
+         if (score >= rebirthCost) {
+            gems++;
+            score = 0;
+            multiplier *= 2;
+            upgradecost = 2000;
+            rebirthCost *= 3;
+            updatescore();
+            document.getElementById("gems").textContent = `gems: ${gems}`;
+            document.getElementById("upgradebutton").textContent = `upgrade (cost: ${upgradecost})`;
+            document.getElementById("rebirthbutton").textContent = `Rebirth (${rebirthCost} score)`;
+         }
+     }
+
+     function buyGemUpgrade(upgradeType) {
+         if (upgradeType === 'clickMultiplier' && gems >= 1) {
+             gems--;
+             clickMultiplier *= 2;
+             document.getElementById("clickMultiplierUpgrade").textContent = `Increase Click Multiplier (Cost: ${Math.ceil(clickMultiplier)} gems)`;
+         } else if (upgradeType === 'autoClicker' && gems >= 5) {
+             gems -= 5;
+             if (autoClickerInterval === null) {
+                 autoClickerInterval = setInterval(increasescore, 1000);
+             } else {
+                 clearInterval(autoClickerInterval);
+                 autoClickerInterval = setInterval(increasescore, 500);
+             }
+             document.getElementById("autoClickerUpgrade").textContent = "Upgrade Auto Clicker (Cost: 5 gems)";
+         }
+         updatescore();
+     }
+
+     function updatescore() {
+         document.getElementById("score").textContent = "score: " + Math.floor(score);
+         document.getElementById("gems").textContent = "gems: " + gems;
+         document.getElementById("upgradebutton").disabled = score < upgradecost;
+         document.getElementById("rebirthbutton").disabled = score < rebirthCost;
+         document.getElementById("clickMultiplierUpgrade").disabled = gems < 1;
+         document.getElementById("autoClickerUpgrade").disabled = gems < 5;
+     }
+     updatescore();
+     </script>
+     </body>
+     </html>
